@@ -10,7 +10,7 @@
 #include "UniversalModuleDrivers/adc.h"
 #include "UniversalModuleDrivers/usbdb.h"
 
-#define WW_PWM_TOP 5000
+#define WW_PWM_TOP 20000 //50Hz
 #define WW_TOP_ANGLE 2200
 #define WW_BOTTOM_ANGLE 800
 
@@ -27,7 +27,7 @@ void window_wiper_init()
 	//prescaler 8000000/8 = 1000000
 	TCCR3B |= (1<<CS31);
 	TCCR3B &= ~((1<<CS32)|(1<<CS30));
-	
+	TIMSK3 |= (1<<TOIE3);
 	//Top of PWM = WW_PWM_TOP;
 	ICR3 = WW_PWM_TOP;
 }
@@ -36,17 +36,14 @@ void window_wiper()
 {
 	ww_adc_val = adc_read(CH_ADC0);
 	
-	if (ww_count < ww_adc_val)
-	{
-		ww_count++;
-		return;
-	}
+	//Increase step from 9 - 28 (or about 3 seconds per sweep to 1 second per sweep at 50Hz)
+	uint8_t step = 9 + ((1000 - ww_adc_val) * 19)/1000;
 	
 	if (ww_adc_val > 1000)
 	{
 		if (ww_angle > 800)
 		{
-			ww_angle = ww_angle - 10;
+			ww_angle = ww_angle - 70;
 		} else {
 			ww_angle = 800;
 		}
@@ -56,7 +53,6 @@ void window_wiper()
 	}
 	else
 	{
-		
 		if (ww_angle == WW_BOTTOM_ANGLE)
 		{
 			ww_dir = 0;
@@ -67,10 +63,10 @@ void window_wiper()
 		
 		if (ww_dir == 0)
 		{
-			ww_angle = ww_angle + 10;
+			ww_angle = ww_angle + step;
 		}else if (ww_dir == 1)
 		{
-			ww_angle = ww_angle - 10;
+			ww_angle = ww_angle - step;
 		}
 		
 		OCR3B = ww_angle;
@@ -78,5 +74,8 @@ void window_wiper()
 	ww_count = 0;
 }
 
-
+ISR(TIMER3_OVF_vect)
+{
+	window_wiper();
+}
 

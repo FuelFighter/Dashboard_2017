@@ -137,6 +137,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="car.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="handle_can_data.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="input_management.c">
       <SubType>compile</SubType>
     </Compile>

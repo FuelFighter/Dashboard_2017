@@ -8,8 +8,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 #include "UniversalModuleDrivers/adc.h"
 #include "UniversalModuleDrivers/usbdb.h"
+#include "UniversalModuleDrivers/can.h"
 #include "input_management.h"
 #include "windowwiper.h"
 #include "UniversalModuleDrivers/pwm.h"
@@ -22,23 +24,18 @@ int main(void)
 	adc_init();		
 	usbdbg_init();
 	pwm_init();
+	//WindowWiper is Interrupt driven at 50Hz, and will be enabled when the value of ADC0 is less than 1000(0-1023). Will go from 3 seconds per sweep to 1 second per sweep.
 	window_wiper_init();
 	timer_init();
 	sei();
 	
-	//timer_start(TIMER0);
+	Car_t c;
 	
 	while(1) 
 	{
-		/*if (timer_elapsed_ms(TIMER0) > 2000)
-		{
-			printf("ADC: %u\n", adc_read(CH_ADC0));
-			//printf("lights: %d\n h_lights: %d\n gen1: %d\n", button_is_pressed(lights), button_is_pressed(h_lights), button_is_pressed(gen1));
-			//printf("wiper: %d\n", adc_read(wiper));
-			timer_start(TIMER0);
-		}*/
-		//For at window wiper skal fungere kan ikke while ha noen delay. Bruk metoder for delay der vi ikke blir stuck i en loop et sted. bruker timer.h fra Universal modules. 
-		window_wiper();
+		handle_can(&c);
 	}
 }
+
+
 
