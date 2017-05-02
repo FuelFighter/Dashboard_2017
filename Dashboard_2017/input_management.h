@@ -12,10 +12,9 @@
 #include "UniversalModuleDrivers/adc.h"
 
 typedef enum {
-	lights = PINB0,
-	h_lights = PINB1,
-	gen1 = PINB2,
-	gen2 = PINB3,
+	lap = PINB0,
+	lights = PINB1,
+	h_lights = PINB2,
 } button_t;
 
 typedef enum {

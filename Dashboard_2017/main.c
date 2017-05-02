@@ -29,14 +29,14 @@ int main(void)
 	timer_init();
 	sei();
 	
-	Car_t c;
+	// Car_t c;
 	timer_start(TIMER1); // start timer1
 	CanMessage_t msg;
 	
 	while(1)
 	{
-		if (timer_elapsed_ms(TIMER1) == 10) {
-			msg.id = 1:
+		if (timer_elapsed_ms(TIMER1) >= 10) {
+			msg.id = 1;
 			msg.length = 3;
 			msg.data[0] = button_is_pressed(lights);
 			msg.data[1] = adc_read(CH_ADC1);
@@ -44,7 +44,7 @@ int main(void)
 			can_send_message(&msg);
 			timer_start(TIMER1); // restart timer1
 		}
-		handle_can(&c);
+		// handle_can(&c);
 	}
 }
 

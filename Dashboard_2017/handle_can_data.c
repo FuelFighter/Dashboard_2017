@@ -11,7 +11,7 @@
 
 CanMessage_t rxFrame;
 
-void handle_can(Car_t *c)
+/*void handle_can(Car_t *c)
 {
 	if (can_read_message_if_new(&rxFrame))
 	{
@@ -107,4 +107,4 @@ void handle_can(Car_t *c)
 			break;
 		}
 	}
-}
+}*/
