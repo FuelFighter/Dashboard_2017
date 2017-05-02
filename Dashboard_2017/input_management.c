@@ -10,13 +10,13 @@
 
 void buttons_init() {
 	
-	PORTB |= (1<<PB1); //Initiate (input) PB4, hazard lights
+	PORTB |= (1<<PB1); //Initiate (input) PB1, lights
 	DDRB &= ~(1<<PB1);
 	
-	PORTB |= (1<<PB2); //Initiate (input) PB4, general purpose 1
+	PORTB |= (1<<PB2); //Initiate (input) PB2, hazard lights
 	DDRB &= ~(1<<PB2);
 	
-	PORTB |= (1<<PB0); //Initiate (input) PB4, lights
+	PORTB |= (1<<PB0); //Initiate (input) PB0, lap
 	DDRB &= ~(1<<PB0);
 }
 
