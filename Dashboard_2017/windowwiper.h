@@ -12,6 +12,7 @@
 
 void window_wiper_init();
 void window_wiper();
+void window_wiper_set_adcVal(uint16_t value);
 
 
 #endif /* WINDOWWIPER_H_ */

@@ -13,15 +13,18 @@
 
 typedef enum {
 	lap = PINB0,
+	brake = PIND0,
 	lights = PINB1,
-	h_lights = PINB2,
+	hazard_lights = PINB2
 } button_t;
 
 typedef enum {
-	wiper = CH_ADC0
+	wiper = CH_ADC0,
+	light_lvl = CH_ADC1
 } adc_t;
 
 void buttons_init();
 bool button_is_pressed(button_t button);
+uint8_t buttons_are_pressed(); 
 
 #endif /* BUTTONS_MANAGEMENT_H_ */

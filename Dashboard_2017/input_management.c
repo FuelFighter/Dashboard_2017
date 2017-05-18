@@ -18,8 +18,30 @@ void buttons_init() {
 	
 	PORTB |= (1<<PB0); //Initiate (input) PB0, lap
 	DDRB &= ~(1<<PB0);
+	
+	PORTD |= (1<<PD0); //Initiate (input) PD0, brake
+	DDRB &= ~(1<<PD0);
 }
 
 bool button_is_pressed(button_t button) {
 	return !((1<<(int)button)&PINB);
+}
+
+uint8_t buttons_are_pressed()
+{
+	uint8_t buttons = 0;
+	if (!button_is_pressed(lights))
+	{
+		buttons |= (1<<0);
+	}
+	if (!button_is_pressed(hazard_lights))
+	{
+		buttons |= (1<<1);
+	}
+	if (button_is_pressed(lap))
+	{
+		buttons |= (1<<2);
+	}
+	
+	return buttons;
 }
