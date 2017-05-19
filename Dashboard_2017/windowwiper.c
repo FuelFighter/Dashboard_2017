@@ -8,56 +8,62 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
+#include <stdbool.h>
 #include "UniversalModuleDrivers/adc.h"
 #include "UniversalModuleDrivers/usbdb.h"
 #include "UniversalModuleDrivers/pwm.h"
 
+// Window Wiper values
 #define WW_PWM_TOP 20000 //50Hz
-#define WW_TOP_ANGLE 2200
-#define WW_BOTTOM_ANGLE 800
-#define WW_ADC_TOP_THRESHOLD 1000
-#define WW_FREQ 30
+#define WW_TOP_ANGLE 1834
+#define WW_BOTTOM_ANGLE 1166
 
-
-uint16_t ww_count = 0;
 uint16_t ww_angle = WW_BOTTOM_ANGLE;
-uint16_t ww_adc_val = 0;
+uint16_t window_wiper_adcVal = 0;
 uint8_t ww_dir = 0;
-uint8_t ww_delay = 0;
+uint8_t ww_step = 0;
+uint8_t ww_off = 1;
+
+void window_wiper_enable(bool var)
+{
+	if (var)
+	{
+		ww_off = 0;
+	} else if (!var){
+		ww_off = 1;
+	}
+}
+
+void window_wiper_stepsize(uint16_t adc_val)
+{
+	float scaled_adc = adc_val/38;
+	ww_step = (int)(6 + scaled_adc);
+}
 
 void window_wiper_init()
 {
-	pwm_init();
-	//Windowwiper uses PE4 -Timer 3
-	//prescaler 8 -> 1000000Mhz
-	pwm_set_prescale(SCALE_8, PWM_T3);
-	//Top of PWM = WW_PWM_TOP;
+	pwm_set_prescale(SCALE_8,PWM_T3);
+	//Set the frequency to 50Hz
 	pwm_set_top_t3(WW_PWM_TOP);
-	TCCR3A |= (1 << COM3A1)|(1 << COM3A0);
-}
-
-void window_wiper_set_adcVal(uint16_t value)
-{
-	ww_adc_val = value;
+	//Idle position
+	pwm_set_duty_cycle(PWM_PE4,WW_BOTTOM_ANGLE);
+	//Set High on Compare Match
+	TCCR3A |= (1<<COM3B1)|(1<<COM3B0);
 }
 
 void window_wiper()
 {
-	
-	//Increase step from 9 - 28 (or about 3 seconds per sweep to 1 second per sweep at ~30Hz)
-	uint8_t step = 45 + (ww_adc_val * 140)/WW_ADC_TOP_THRESHOLD;
-	
-	if (1023 - ww_adc_val > WW_ADC_TOP_THRESHOLD)
+	if (ww_off)
 	{
 		if (ww_angle > WW_BOTTOM_ANGLE)
 		{
-			ww_angle = ww_angle - 70;
-		} else {
+			ww_angle = ww_angle - 16;
+			} else {
 			ww_angle = WW_BOTTOM_ANGLE;
 		}
 		pwm_set_duty_cycle(PWM_PE4, ww_angle);
 	}
-	else
+	else if (!ww_off)
 	{
 		if (ww_angle <= WW_BOTTOM_ANGLE)
 		{
@@ -69,10 +75,10 @@ void window_wiper()
 		
 		if (ww_dir == 0)
 		{
-			ww_angle = ww_angle + step;
+			ww_angle = ww_angle + ww_step;
 		}else if (ww_dir == 1)
 		{
-			ww_angle = ww_angle - step;
+			ww_angle = ww_angle - ww_step;
 		}
 		pwm_set_duty_cycle(PWM_PE4, ww_angle);
 	}
