@@ -14,7 +14,7 @@
 #include "UniversalModuleDrivers/can.h"
 #include "input_management.h"
 #include "windowwiper.h"
-//#include "horn.h"
+#include "horn.h"
 #include "UniversalModuleDrivers/pwm.h"
 #include "UniversalModuleDrivers/timer.h"
 #include "UniversalModuleDrivers/rgbled.h"
@@ -49,6 +49,7 @@ int main(void)
 	usbdbg_init();
 	adc_init();
 	pwm_init();
+	horn_init();
 	window_wiper_init();
 	buttons_init();
 	timer_init();
@@ -112,6 +113,10 @@ int main(void)
 			{
 				if (rxFrame.data.u8[1] & (1 << HORN_BUTTON_BIT))
 				{
+					horn_set(ON);
+					printf("HER\n");
+				}else{
+					horn_set(OFF);
 				}
 			}
 
@@ -133,3 +138,6 @@ void transmit_can_to_serial(CanMessage_t *dataFrame)
 	printf("]\n");
 }
 
+ISR(TIMER2_COMP_vect){
+	PORTB ^= (1 << PB4);
+}
